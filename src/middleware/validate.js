@@ -1,10 +1,10 @@
 const validationSchema = (schema) => {
     return (req, res, next) => {
         try {
-            const { error } = schema.validate()
+            const { error } = schema.validate(req.body)
             if (error) {
                 console.log(error)
-                return res.status(400).json({ Response: "Wrong user inputs" })
+                return res.status(400).json({ Response: "Wrong inputs fields" })
             }
             return next();
         } catch (err) {
@@ -13,3 +13,5 @@ const validationSchema = (schema) => {
         }
     }
 }
+
+export default validationSchema
