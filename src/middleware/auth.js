@@ -4,7 +4,7 @@ const authentificate = (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-        return res.status(401).json({ response: "Bad authorization 123" })
+        return res.status(401).json({ response: "Bad authorization" })
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {

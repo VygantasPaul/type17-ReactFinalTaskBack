@@ -26,4 +26,13 @@ const GET_QUESTIONS = async (req, res) => {
     }
 }
 
-export { ADD_QUESTION, GET_QUESTIONS }
+const DELETE_QUESTION = (req, res) => {
+    try {
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: "Error ocurred", })
+    }
+}
+
+export { ADD_QUESTION, GET_QUESTIONS, DELETE_QUESTION }

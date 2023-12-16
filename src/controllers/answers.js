@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import AnswersModel from "../models/answers.js"
 import QuestionsModel from "../models/questions.js";
 
@@ -24,9 +23,10 @@ const ADD_ANSWER = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
+
 const GET_QUESTION_ANSWER = async (req, res) => {
     try {
-        // const question = await QuestionModel.findById(req.params.id)
+
         const answer = await QuestionsModel.aggregate([
             {
                 $lookup: {
@@ -64,5 +64,4 @@ const DELETE_ANSWER = async (req, res) => {
     }
 }
 
-
-export { GET_ANSWERS, ADD_ANSWER, DELETE_ANSWER, GET_QUESTION_ANSWER }
+export { ADD_ANSWER, GET_ANSWERS, DELETE_ANSWER, GET_QUESTION_ANSWER }
