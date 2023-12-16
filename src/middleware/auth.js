@@ -8,7 +8,6 @@ const authentificate = (req, res, next) => {
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-
         if (err) {
             return res.status(401).json({ response: "Bad authorization" })
         }
