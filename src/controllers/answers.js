@@ -10,7 +10,6 @@ const ADD_ANSWER = async (req, res) => {
     try {
         const answer = new AnswersModel({
             answer_text: req.body.answer_text,
-            avatar: req.body.avatar,
             gained_likes_number: req.body.gained_likes_number,
             question_id: questionId.id,
             user_id: req.body.userId

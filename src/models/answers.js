@@ -5,7 +5,6 @@ const answersSchema = new mongoose.Schema(
         id: { type: String },
         question_id: { type: String },
         user_id: { type: String },
-        avatar: { type: String },
         answer_text: { type: String, required: true },
         gained_likes_number: { type: Number },
     },

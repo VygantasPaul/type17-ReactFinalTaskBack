@@ -4,7 +4,6 @@ const questionsSchema = new mongoose.Schema(
     {
         id: { type: String },
         user_id: { type: Array },
-        avatar: { type: String },
         question_text: { type: String, required: true },
 
     },
