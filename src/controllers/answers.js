@@ -15,6 +15,7 @@ const ADD_ANSWER = async (req, res) => {
             user_id: req.body.userId
         })
         answer.id = answer._id
+
         const response = await answer.save();
         return res.status(200).json({ response, status: "Answer created" })
     } catch (err) {
@@ -23,26 +24,7 @@ const ADD_ANSWER = async (req, res) => {
     }
 }
 
-const GET_QUESTION_ANSWER = async (req, res) => {
-    try {
 
-        const answer = await QuestionsModel.aggregate([
-            {
-                $lookup: {
-                    from: "questions",
-                    localField: "question_id",
-                    foreignField: "id",
-                    as: "answers_data"
-
-                }
-            }, { $match: { id: (req.params.id) } }
-        ])
-        return res.status(200).json({ answer, status: "Answers" })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
-    }
-}
 
 const GET_ANSWERS = async (req, res) => {
     try {
@@ -63,4 +45,4 @@ const DELETE_ANSWER = async (req, res) => {
     }
 }
 
-export { ADD_ANSWER, GET_ANSWERS, DELETE_ANSWER, GET_QUESTION_ANSWER }
+export { ADD_ANSWER, GET_ANSWERS, DELETE_ANSWER }

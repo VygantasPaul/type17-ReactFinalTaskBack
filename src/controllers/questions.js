@@ -4,6 +4,7 @@ const ADD_QUESTION = async (req, res) => {
     try {
         const question = new QuestionsModel({
             question_text: req.body.question_text,
+            answer_id: req.body.answer_id,
             user_id: req.body.userId,
         });
         question.id = question._id
@@ -14,11 +15,45 @@ const ADD_QUESTION = async (req, res) => {
         return res.status(500).json({ status: "Error occurred" });
     }
 };
+const GET_QUESTION_ANSWER = async (req, res) => {
 
-const GET_QUESTIONS = async (req, res) => {
     try {
-        const questions = await QuestionsModel.find()
-        return res.status(200).json({ questions, status: "Questions" })
+
+        const questionAnswer = await QuestionsModel.aggregate([
+
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id", // Field in the 'questions' collection
+                    foreignField: "question_id", // Field in the 'answers' collection
+                    as: "answers_data"
+                }
+            },
+            {
+                $match: { id: (req.params.id) } // Match the question by id
+            }
+        ]);
+        console.log(questionAnswer)
+        return res.status(200).json({ questionAnswer, status: "Questions answer" })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: "Error ocurred", })
+    }
+}
+const GET_QUESTIONS_WITH_ANSWERS = async (req, res) => {
+    try {
+        const questionsAnswer = await QuestionsModel.aggregate([
+
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id", // Field in the 'questions' collection
+                    foreignField: "question_id", // Field in the 'answers' collection
+                    as: "answers_data"
+                }
+            },
+        ]);
+        return res.status(200).json({ questionsAnswer, status: "Questions answer" })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: "Error ocurred", })
@@ -34,4 +69,4 @@ const DELETE_QUESTION = (req, res) => {
     }
 }
 
-export { ADD_QUESTION, GET_QUESTIONS, DELETE_QUESTION }
+export { ADD_QUESTION, GET_QUESTIONS_WITH_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER }
