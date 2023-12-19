@@ -4,7 +4,7 @@ const ADD_QUESTION = async (req, res) => {
     try {
         const question = new QuestionsModel({
             question_text: req.body.question_text,
-            answer_id: req.body.answer_id,
+            // answer_id: req.body.answer_id,
             user_id: req.body.userId,
         });
         question.id = question._id
@@ -39,10 +39,9 @@ const GET_QUESTION_ANSWER = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
-const GET_QUESTIONS_WITH_ANSWERS = async (req, res) => {
+const GET_QUESTIONS_ANSWERS = async (req, res) => {
     try {
         const questionsAnswer = await QuestionsModel.aggregate([
-
             {
                 $lookup: {
                     from: "answers",
@@ -58,6 +57,61 @@ const GET_QUESTIONS_WITH_ANSWERS = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
+const GET_QUESTION_WITH_ANSWERS = async (req, res) => {
+    try {
+        const question = await QuestionsModel.aggregate([
+
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id", // Field in the 'questions' collection
+                    foreignField: "question_id", // Field in the 'answers' collection
+                    as: "answers_data"
+                }
+            }, {
+                $match: { answers_data: { $exists: true, $ne: [] } } // Match questions with at least one answer
+            }
+        ]);
+
+        if (question.length > 0) {
+            return res.status(200).json({ question, response: "Questions are not empty" });
+        } else {
+            return res.status(404).json({ response: "No result" });
+        }
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: "Error ocurred", })
+    }
+
+}
+const GET_QUESTION_WITH_NO_ANSWERS = async (req, res) => {
+    try {
+        const questionNoAnswers = await QuestionsModel.aggregate([
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id",
+                    foreignField: "question_id",
+                    as: "answers_data"
+                }
+            },
+            {
+                $match: { answers_data: { $size: 0 } }
+            }
+        ]);
+
+        if (questionNoAnswers.length === 0) {
+            return res.status(200).json({ questionNoAnswers, response: "Questions are empty" });
+        } else {
+            return res.status(404).json({ questionNoAnswers, response: "No result" });
+        }
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ status: "Error occurred" });
+    }
+};
 
 const DELETE_QUESTION = async (req, res) => {
     try {
@@ -72,4 +126,4 @@ const DELETE_QUESTION = async (req, res) => {
     }
 }
 
-export { ADD_QUESTION, GET_QUESTIONS_WITH_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER }
+export { ADD_QUESTION, GET_QUESTIONS_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS }
