@@ -3,7 +3,7 @@ import QuestionsModel from "../models/questions.js";
 
 const ADD_ANSWER = async (req, res) => {
     const questionId = await QuestionsModel.findById(req.params.id);
-    console.log(questionId)
+
     if (!questionId) {
         return res.status(404).json({ status: "Question not found" });
     }
@@ -24,8 +24,6 @@ const ADD_ANSWER = async (req, res) => {
     }
 }
 
-
-
 const GET_ANSWERS = async (req, res) => {
     try {
         const answers = await AnswersModel.find()
@@ -37,8 +35,11 @@ const GET_ANSWERS = async (req, res) => {
 }
 const DELETE_ANSWER = async (req, res) => {
     try {
-        const answer = await UserModel.findByIdAndDelete(req.params.id)
-        return res.status(200).json({ status: "Answer deleted ", answer })
+        const answerDelete = await UserModel.findByIdAndDelete(req.params.id)
+        if (answerDelete === null) {
+            return res.status(404).json({ status: "Answer not exist" });
+        }
+        return res.status(200).json({ status: "Answer deleted ", answerDelete })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ answers, status: "Error ocurred", })

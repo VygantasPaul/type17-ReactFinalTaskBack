@@ -16,7 +16,6 @@ const ADD_QUESTION = async (req, res) => {
     }
 };
 const GET_QUESTION_ANSWER = async (req, res) => {
-
     try {
 
         const questionAnswer = await QuestionsModel.aggregate([
@@ -24,8 +23,8 @@ const GET_QUESTION_ANSWER = async (req, res) => {
             {
                 $lookup: {
                     from: "answers",
-                    localField: "id", // Field in the 'questions' collection
-                    foreignField: "question_id", // Field in the 'answers' collection
+                    localField: "id",
+                    foreignField: "question_id",
                     as: "answers_data"
                 }
             },
@@ -62,7 +61,11 @@ const GET_QUESTIONS_WITH_ANSWERS = async (req, res) => {
 
 const DELETE_QUESTION = (req, res) => {
     try {
-
+        const questionDelete = QuestionsModel.findByIdAndDelete(req.params.id)
+        if (questionDelete === null) {
+            return res.status(404).json({ status: "Question not exist" });
+        }
+        return res.json({ response: questionDelete, status: "Question was deleted" });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: "Error ocurred", })
