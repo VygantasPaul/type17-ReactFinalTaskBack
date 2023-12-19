@@ -59,13 +59,13 @@ const GET_QUESTIONS_WITH_ANSWERS = async (req, res) => {
     }
 }
 
-const DELETE_QUESTION = (req, res) => {
+const DELETE_QUESTION = async (req, res) => {
     try {
-        const questionDelete = QuestionsModel.findByIdAndDelete(req.params.id)
-        if (questionDelete === null) {
+        const questionDelete = await QuestionsModel.findByIdAndDelete(req.params.id)
+        if (!questionDelete) {
             return res.status(404).json({ status: "Question not exist" });
         }
-        return res.json({ response: questionDelete, status: "Question was deleted" });
+        return res.status(200).json({ response: questionDelete, status: "Question was deleted" });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: "Error ocurred", })

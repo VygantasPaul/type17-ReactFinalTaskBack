@@ -35,7 +35,7 @@ const GET_ANSWERS = async (req, res) => {
 }
 const DELETE_ANSWER = async (req, res) => {
     try {
-        const answerDelete = await UserModel.findByIdAndDelete(req.params.id)
+        const answerDelete = await AnswersModel.findByIdAndDelete(req.params.id)
         if (answerDelete === null) {
             return res.status(404).json({ status: "Answer not exist" });
         }
