@@ -12,6 +12,7 @@ router.get('/questions/withAnswers', GET_QUESTION_WITH_ANSWERS)
 router.get('/questions/:id/answers', auth, GET_QUESTION_ANSWER)
 
 router.delete('/questions/:id', DELETE_QUESTION)
+
 export { ADD_QUESTION, GET_QUESTIONS_ANSWERS, GET_QUESTION_ANSWER, DELETE_QUESTION, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS }
 
 export default router;

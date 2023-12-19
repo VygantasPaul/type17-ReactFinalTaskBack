@@ -59,7 +59,7 @@ const GET_QUESTIONS_ANSWERS = async (req, res) => {
 }
 const GET_QUESTION_WITH_ANSWERS = async (req, res) => {
     try {
-        const question = await QuestionsModel.aggregate([
+        const questionWithAnswers = await QuestionsModel.aggregate([
 
             {
                 $lookup: {
@@ -73,8 +73,8 @@ const GET_QUESTION_WITH_ANSWERS = async (req, res) => {
             }
         ]);
 
-        if (question.length > 0) {
-            return res.status(200).json({ question, response: "Questions are not empty" });
+        if (questionWithAnswers.length > 0) {
+            return res.status(200).json({ questionWithAnswers, response: "Questions with answers" });
         } else {
             return res.status(404).json({ response: "No result" });
         }
@@ -101,10 +101,10 @@ const GET_QUESTION_WITH_NO_ANSWERS = async (req, res) => {
             }
         ]);
 
-        if (questionNoAnswers.length === 0) {
-            return res.status(200).json({ questionNoAnswers, response: "Questions are empty" });
+        if (questionNoAnswers.length > 0) {
+            return res.status(200).json({ questionNoAnswers, response: "Questions with no answers" });
         } else {
-            return res.status(404).json({ questionNoAnswers, response: "No result" });
+            return res.status(404).json({ response: "No result" });
         }
 
     } catch (err) {
