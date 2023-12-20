@@ -4,8 +4,7 @@ const questionsSchema = new mongoose.Schema(
     {
         id: { type: String },
         user_id: { type: Array },
-        question_text: { type: String, required: true },
-
+        question_text: { type: String, required: true }
     },
     {
         timestamps: true
