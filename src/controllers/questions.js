@@ -59,7 +59,7 @@ const GET_QUESTION_ANSWER = async (req, res) => {
 }
 const GET_QUESTIONS_ANSWERS = async (req, res) => {
     try {
-        const questionsAnswer = await QuestionsModel.aggregate([
+        const questionsWithAnswers = await QuestionsModel.aggregate([
             {
                 $lookup: {
                     from: "answers",
@@ -69,7 +69,7 @@ const GET_QUESTIONS_ANSWERS = async (req, res) => {
                 }
             },
         ]);
-        return res.status(200).json({ questionsAnswer, status: "Questions answer" })
+        return res.status(200).json({ questionsWithAnswers, status: "Questions answer" })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: "Error ocurred", })

@@ -1,6 +1,6 @@
 import AnswersModel from "../models/answers.js"
 import QuestionsModel from "../models/questions.js";
-
+import UsersModel from "../models/users.js";
 const ADD_ANSWER = async (req, res) => {
     const questionId = await QuestionsModel.findById(req.params.id);
 
@@ -70,15 +70,22 @@ const GET_ANSWERS = async (req, res) => {
 }
 const DELETE_ANSWER = async (req, res) => {
     try {
-        const answerDelete = await AnswersModel.findByIdAndDelete(req.params.id)
-        if (answerDelete === null) {
-            return res.status(404).json({ status: "Answer not exist" });
+        const answer = await AnswersModel.findById(req.params.id);
+        const user = await UsersModel.findById(req.body.userId);
+        const user_id = user.id;
+
+        if (answer.user_id == user_id) {
+            const deleted = await AnswersModel.findByIdAndDelete(req.params.id)
+            return res.status(200).json({ deleted, message: "Comment deleted successfully" });
+        } else {
+            return res.status(401).json({ message: "Unauthorized to delete this comment" });
         }
-        return res.status(200).json({ status: "Answer deleted ", answerDelete })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ answers, status: "Error ocurred", })
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
 
 export { ADD_ANSWER, GET_ANSWERS, DELETE_ANSWER, LIKE_ANSWER, DISLIKE_ANSWER }
