@@ -1,5 +1,4 @@
 import QuestionsModel from '../models/questions.js'
-import AnswersModel from '../models/answers.js';
 import UsersModel from '../models/users.js';
 const ADD_QUESTION = async (req, res) => {
     try {
@@ -19,7 +18,26 @@ const ADD_QUESTION = async (req, res) => {
 };
 const GET_QUESTIONS = async (req, res) => {
     try {
-        const questions = await QuestionsModel.find()
+        const questions = await QuestionsModel.aggregate([
+
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id",
+                    foreignField: "question_id",
+                    as: "answers_data"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user_id',
+                    foreignField: 'id',
+                    as: 'user_data'
+                }
+            },
+
+        ]);
         return res.status(200).json({ questions, status: "Questions" })
     } catch (err) {
         console.log(err)
@@ -41,6 +59,42 @@ const GET_QUESTION_ANSWER = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user_id',
+                    foreignField: 'id',
+                    as: 'user_data'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$answers_data",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'answers_data.user_id',
+                    foreignField: 'id',
+                    as: 'answers_data.user_data'
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    id: { $first: '$id' },
+                    title: { $first: '$title' },
+                    tags: { $first: '$tags' },
+                    user_id: { $first: '$user_id' },
+                    question_text: { $first: '$question_text' },
+                    createdAt: { $first: '$createdAt' },
+                    updatedAt: { $first: '$updatedAt' },
+                    answers_data: { $push: '$answers_data' },
+                    user_data: { $first: '$user_data' }
+                }
+            },
+            {
                 $match: { id: (req.params.id) } // Match the question by id
             }
         ]);
@@ -51,24 +105,7 @@ const GET_QUESTION_ANSWER = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
-const GET_QUESTIONS_ANSWERS = async (req, res) => {
-    try {
-        const questionsAnswers = await QuestionsModel.aggregate([
-            {
-                $lookup: {
-                    from: "answers",
-                    localField: "id", // Field in the 'questions' collection
-                    foreignField: "question_id", // Field in the 'answers' collection
-                    as: "answers_data"
-                }
-            },
-        ]);
-        return res.status(200).json({ questionsAnswers, status: "Questions answer" })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
-    }
-}
+
 const GET_QUESTION_WITH_ANSWERS = async (req, res) => {
     try {
         const questionWithAnswers = await QuestionsModel.aggregate([
@@ -88,7 +125,7 @@ const GET_QUESTION_WITH_ANSWERS = async (req, res) => {
         if (questionWithAnswers.length > 0) {
             return res.status(200).json({ questionWithAnswers, response: "Questions with answers" });
         } else {
-            return res.status(404).json({ response: "No result" });
+            return res.status(404).json({ response: "Not Found", status: "No result" });
         }
 
     } catch (err) {
@@ -112,17 +149,17 @@ const GET_QUESTION_WITH_NO_ANSWERS = async (req, res) => {
                 $match: { answers_data: { $size: 0 } }
             }
         ]);
-
-        if (questionNoAnswers.length > 0) {
+        if (questionNoAnswers.length == 0) {
             return res.status(200).json({ questionNoAnswers, response: "Questions with no answers" });
         } else {
-            return res.status(404).json({ response: "No result" });
+            return res.status(404).json({ response: "Not Found", status: "No result" });
         }
 
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({ status: "Error occurred" });
+        console.error(err);
+        return res.status(500).json({ status: "Internal Server Error", error: "An unexpected error occurred. Please try again later." });
     }
+
 };
 
 const DELETE_QUESTION = async (req, res) => {
@@ -145,4 +182,4 @@ const DELETE_QUESTION = async (req, res) => {
 };
 
 
-export { ADD_QUESTION, GET_QUESTIONS_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS, GET_QUESTIONS }
+export { ADD_QUESTION, DELETE_QUESTION, GET_QUESTION_ANSWER, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS, GET_QUESTIONS }
