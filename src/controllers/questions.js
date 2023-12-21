@@ -67,34 +67,6 @@ const GET_QUESTION_ANSWER = async (req, res) => {
                 }
             },
             {
-                $unwind: {
-                    path: "$answers_data",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'answers_data.user_id',
-                    foreignField: 'id',
-                    as: 'answers_data.user_data'
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    id: { $first: '$id' },
-                    title: { $first: '$title' },
-                    tags: { $first: '$tags' },
-                    user_id: { $first: '$user_id' },
-                    question_text: { $first: '$question_text' },
-                    createdAt: { $first: '$createdAt' },
-                    updatedAt: { $first: '$updatedAt' },
-                    answers_data: { $push: '$answers_data' },
-                    user_data: { $first: '$user_data' }
-                }
-            },
-            {
                 $match: { id: (req.params.id) } // Match the question by id
             }
         ]);
