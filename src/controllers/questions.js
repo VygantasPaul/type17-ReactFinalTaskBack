@@ -4,6 +4,8 @@ import UsersModel from '../models/users.js';
 const ADD_QUESTION = async (req, res) => {
     try {
         const question = new QuestionsModel({
+            title: req.body.title,
+            tags: req.body.tags,
             question_text: req.body.question_text,
             user_id: req.body.userId,
         });
@@ -24,15 +26,7 @@ const GET_QUESTIONS = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
-const GET_QUESTION_ID = async (req, res) => {
-    try {
-        const question = await QuestionsModel.findById(req.params.id)
-        return res.status(200).json({ question, status: "Questions" })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
-    }
-}
+
 const GET_QUESTION_ANSWER = async (req, res) => {
     try {
 
@@ -59,7 +53,7 @@ const GET_QUESTION_ANSWER = async (req, res) => {
 }
 const GET_QUESTIONS_ANSWERS = async (req, res) => {
     try {
-        const questionsWithAnswers = await QuestionsModel.aggregate([
+        const questionsAnswers = await QuestionsModel.aggregate([
             {
                 $lookup: {
                     from: "answers",
@@ -69,7 +63,7 @@ const GET_QUESTIONS_ANSWERS = async (req, res) => {
                 }
             },
         ]);
-        return res.status(200).json({ questionsWithAnswers, status: "Questions answer" })
+        return res.status(200).json({ questionsAnswers, status: "Questions answer" })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: "Error ocurred", })
@@ -131,8 +125,6 @@ const GET_QUESTION_WITH_NO_ANSWERS = async (req, res) => {
     }
 };
 
-
-
 const DELETE_QUESTION = async (req, res) => {
     try {
         const question = await QuestionsModel.findById(req.params.id);
@@ -153,4 +145,4 @@ const DELETE_QUESTION = async (req, res) => {
 };
 
 
-export { ADD_QUESTION, GET_QUESTIONS_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS, GET_QUESTIONS, GET_QUESTION_ID }
+export { ADD_QUESTION, GET_QUESTIONS_ANSWERS, DELETE_QUESTION, GET_QUESTION_ANSWER, GET_QUESTION_WITH_NO_ANSWERS, GET_QUESTION_WITH_ANSWERS, GET_QUESTIONS }
