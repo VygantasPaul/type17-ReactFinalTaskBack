@@ -10,7 +10,8 @@ const ADD_ANSWER = async (req, res) => {
     try {
         const answer = new AnswersModel({
             answer_text: req.body.answer_text,
-            gained_likes_number: 0,
+            gained_likes_number: req.body.gained_likes_number,
+            gained_dislikes_number: req.body.gained_dislikes_number,
             question_id: questionId.id,
             user_id: req.body.userId
         })
@@ -24,17 +25,21 @@ const ADD_ANSWER = async (req, res) => {
     }
 }
 const LIKE_ANSWER = async (req, res) => {
-    const answerId = req.params.id;
     try {
-        const answer = await AnswersModel.findById(answerId);
+        const answer = await AnswersModel.findById(req.params.id);
+        const user = await UsersModel.findById(req.body.userId);
 
-        if (!answer) {
-            return res.status(404).json({ status: "Answer not found" });
+        if (!answer.gained_likes_number.includes(user.id) && !answer.gained_dislikes_number.includes(user.id)) {
+            // Update the gained_likes_number array
+            answer.gained_likes_number.push(user.id);
+            console.log('user:', user.id);
+            console.log('answer: ', answer);
+
+            await answer.save();
+            return res.status(200).json({ response: answer, status: "Answer liked" });
+        } else {
+            return res.status(400).json({ status: "User already liked or disliked this answer" });
         }
-        answer.gained_likes_number += 1;
-        const updatedAnswer = await answer.save();
-
-        return res.status(200).json({ response: updatedAnswer, status: "Answer liked" });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ status: "Error occurred" });
@@ -42,17 +47,22 @@ const LIKE_ANSWER = async (req, res) => {
 };
 
 const DISLIKE_ANSWER = async (req, res) => {
-    const answerId = req.params.id;
     try {
-        const answer = await AnswersModel.findById(answerId);
+        const answer = await AnswersModel.findById(req.params.id);
+        const user = await UsersModel.findById(req.body.userId);
 
-        if (!answer) {
-            return res.status(404).json({ status: "Answer not found" });
+        if (!answer.gained_dislikes_number.includes(user.id) && !answer.gained_likes_number.includes(user.id)) {
+            // Update the gained_dislikes_number array
+            answer.gained_dislikes_number.push(user.id);
+
+            console.log('user:', user.id);
+            console.log('answer: ', answer);
+
+            await answer.save();
+            return res.status(200).json({ response: answer, status: "Answer disliked" });
+        } else {
+            return res.status(400).json({ status: "User already liked or disliked this answer" });
         }
-        answer.gained_likes_number -= 1;
-        const updatedAnswer = await answer.save();
-
-        return res.status(200).json({ response: updatedAnswer, status: "Answer Disliked" });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ status: "Error occurred" });
@@ -61,13 +71,32 @@ const DISLIKE_ANSWER = async (req, res) => {
 
 const GET_ANSWERS = async (req, res) => {
     try {
-        const answers = await AnswersModel.find()
-        return res.status(200).json({ answers, status: "Answers" })
+        const answers = await AnswersModel.aggregate([
+
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id",
+                    foreignField: "question_id",
+                    as: "answers_data"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user_id',
+                    foreignField: 'id',
+                    as: 'user_data'
+                }
+            },
+        ]);
+        return res.status(200).json({ answers, status: "Answers" });
     } catch (err) {
-        console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
+        console.log(err);
+        return res.status(500).json({ status: "Error occurred" });
     }
-}
+};
+
 const DELETE_ANSWER = async (req, res) => {
     try {
         const answer = await AnswersModel.findById(req.params.id);

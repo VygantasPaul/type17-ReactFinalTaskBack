@@ -6,7 +6,8 @@ const answersSchema = new mongoose.Schema(
         question_id: { type: String },
         user_id: { type: String },
         answer_text: { type: String, required: true },
-        gained_likes_number: { type: Number },
+        gained_likes_number: { type: Array },
+        gained_dislikes_number: { type: Array },
     },
     {
         timestamps: true

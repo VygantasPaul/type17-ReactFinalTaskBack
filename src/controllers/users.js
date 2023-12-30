@@ -35,7 +35,7 @@ const LOGIN_USER = async (req, res) => {
             if (err || !isAuthMatch) {
                 return res.status(401).json({ status: "Wrong user name or password", })
             }
-            const token = jwt.sign({ email: user.email, userId: user._id }, process.env.SECRET_KEY, { expiresIn: "12h" }, { algorithm: "RS256" })
+            const token = jwt.sign({ email: user.email, userId: user._id }, process.env.SECRET_KEY, { expiresIn: "24h" }, { algorithm: "RS256" })
             return res.status(200).json({ token, status: "User logged in", user: user.name, avatar: user.avatar })
         })
     } catch (err) {
