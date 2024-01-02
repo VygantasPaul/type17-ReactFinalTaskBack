@@ -190,7 +190,14 @@ const GET_QUESTION_WITH_NO_ANSWERS = async (req, res) => {
                     as: "answers_data"
                 }
             },
-
+            {
+                $lookup: {
+                    from: "answers",
+                    localField: "id",
+                    foreignField: "question_id",
+                    as: "answers_data"
+                }
+            },
             {
                 $match: { answers_data: { $size: 0 } }
             }
