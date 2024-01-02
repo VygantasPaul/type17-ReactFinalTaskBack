@@ -43,9 +43,9 @@ const LOGIN_USER = async (req, res) => {
         return res.status(500).json({ status: "Error ocurred", })
     }
 }
-const GET_USERS = (req, res) => {
+const GET_USERS = async (req, res) => {
     try {
-        const users = UsersModel.find()
+        const users = await UsersModel.find()
         return res.status(200).json({ users, status: "Users" })
     } catch (err) {
         console.log(err)
