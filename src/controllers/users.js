@@ -17,7 +17,7 @@ const REGISTER_USER = async (req, res) => {
         return res.status(200).json({ response, status: "User registered" })
     } catch (err) {
         console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
+        return res.status(500).json({ response: "User registered", status: "Error ocurred", })
     }
 }
 
@@ -49,7 +49,7 @@ const GET_USERS = (req, res) => {
         return res.status(200).json({ users, status: "Users" })
     } catch (err) {
         console.log(err)
-        return res.status(500).json({ status: "Error ocurred", })
+        return res.status(500).json({ response: "All users", status: "Error ocurred", })
     }
 }
 
